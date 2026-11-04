@@ -1,20 +1,17 @@
+
 name: Build AuraX Music Bot
 
 on:
   push:
     branches:
       - main
-
   workflow_dispatch:
-
-  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
   build:
-    name: Build C++ Bot
     runs-on: ubuntu-22.04
 
     steps:
@@ -24,7 +21,6 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-
           sudo apt-get install -y \
             g++ \
             make \
@@ -38,14 +34,32 @@ jobs:
             libcurl4-openssl-dev \
             ffmpeg
 
-      - name: Check Compiler
+      - name: Build D++
         run: |
-          g++ --version
-          ffmpeg -version
+          git clone --depth 1 \
+            https://github.com/brainboxdotcc/DPP.git \
+            /tmp/DPP
+
+          cmake -S /tmp/DPP -B /tmp/DPP/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DDPP_BUILD_TEST=OFF \
+            -DDPP_INSTALL=ON
+
+          cmake --build /tmp/DPP/build \
+            --parallel 2
+
+          sudo cmake --install /tmp/DPP/build
+
+          sudo ldconfig
+
+      - name: Verify D++
+        run: |
+          test -f /usr/local/include/dpp/dpp.h
+          ldconfig -p | grep dpp
 
       - name: Build Bot
         run: |
-          make clean || true
+          make clean
           make
 
       - name: Verify Executable
@@ -53,10 +67,9 @@ jobs:
           test -f aurax_music
           file aurax_music
 
-      - name: Upload Build Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: aurax-music-linux
           path: aurax_music
           if-no-files-found: error
-          retention-days: 7
