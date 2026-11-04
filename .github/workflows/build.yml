@@ -1,0 +1,62 @@
+name: Build AuraX Music Bot
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build C++ Bot
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            g++ \
+            make \
+            cmake \
+            git \
+            curl \
+            pkg-config \
+            libssl-dev \
+            zlib1g-dev \
+            libopus-dev \
+            libcurl4-openssl-dev \
+            ffmpeg
+
+      - name: Check Compiler
+        run: |
+          g++ --version
+          ffmpeg -version
+
+      - name: Build Bot
+        run: |
+          make clean || true
+          make
+
+      - name: Verify Executable
+        run: |
+          test -f aurax_music
+          file aurax_music
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurax-music-linux
+          path: aurax_music
+          if-no-files-found: error
+          retention-days: 7
