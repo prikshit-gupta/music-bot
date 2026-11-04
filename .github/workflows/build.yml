@@ -43,10 +43,10 @@ jobs:
           cmake -S /tmp/DPP -B /tmp/DPP/build \
             -DCMAKE_BUILD_TYPE=Release \
             -DDPP_BUILD_TEST=OFF \
-            -DDPP_INSTALL=ON
+            -DDPP_INSTALL=ON \
+            -DCMAKE_INSTALL_PREFIX=/usr/local
 
-          cmake --build /tmp/DPP/build \
-            --parallel 2
+          cmake --build /tmp/DPP/build --parallel 2
 
           sudo cmake --install /tmp/DPP/build
 
@@ -56,10 +56,9 @@ jobs:
         run: |
           test -f /usr/local/include/dpp/dpp.h
 
-          echo "Checking DPP library..."
-          find /usr/local/lib -name "libdpp*"
+          echo "DPP libraries:"
+          find /usr/local/lib -name "libdpp.so*"
 
-          sudo ldconfig
           ldconfig -p | grep dpp
 
       - name: Build Bot
@@ -67,15 +66,27 @@ jobs:
           make clean
           make
 
+      - name: Bundle DPP Library
+        run: |
+          mkdir -p dist
+
+          cp aurax_music dist/
+
+          cp -P /usr/local/lib/libdpp.so* dist/
+
+          echo "Bundled files:"
+          ls -lh dist/
+
       - name: Verify Executable
         run: |
-          test -f aurax_music
-          file aurax_music
-          ldd aurax_music
+          file dist/aurax_music
+
+          echo "Checking dependencies:"
+          ldd dist/aurax_music
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: aurax-music-linux
-          path: aurax_music
+          path: dist/
           if-no-files-found: error
