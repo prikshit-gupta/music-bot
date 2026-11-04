@@ -1,10 +1,12 @@
 CXX := g++
+
 CXXFLAGS := -std=c++17 -O2 -Wall -Wextra -Iinclude
-LDFLAGS := -ldpp -pthread
 
-SRCS := main.cpp music_queue.cpp 
+LDFLAGS := -Wl,-Bstatic -ldpp -Wl,-Bdynamic -pthread
 
-TARGET := aurax_music
+SRCS := main.cpp music_queue.cpp
+
+TARGET := app
 
 all:
 	$(CXX) $(CXXFLAGS) $(SRCS) -o $(TARGET) $(LDFLAGS)
