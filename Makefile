@@ -2,10 +2,10 @@ CXX := g++
 CXXFLAGS := -std=c++17 -O2 -Wall -Wextra
 LDFLAGS := -ldpp -pthread
 
-SRC := src/main.cpp \
-       src/music_queue.cpp \
-       src/audio_player.cpp \
-       src/music_commands.cpp
+SRC := main.cpp \
+       music_queue.cpp \
+       audio_player.cpp \
+       music_commands.cpp
 
 TARGET := aurax_music
 
