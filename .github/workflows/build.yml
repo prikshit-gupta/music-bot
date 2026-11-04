@@ -55,6 +55,11 @@ jobs:
       - name: Verify D++
         run: |
           test -f /usr/local/include/dpp/dpp.h
+
+          echo "Checking DPP library..."
+          find /usr/local/lib -name "libdpp*"
+
+          sudo ldconfig
           ldconfig -p | grep dpp
 
       - name: Build Bot
@@ -66,6 +71,7 @@ jobs:
         run: |
           test -f aurax_music
           file aurax_music
+          ldd aurax_music
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
